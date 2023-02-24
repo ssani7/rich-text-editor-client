@@ -37,6 +37,23 @@ body {
   margin: 1in;
 }
 
+/* .ql-label:before {
+  content: "<input/>";
+} */
+
+.ql-spanblock:after {
+  content: "<sb/>";
+}
+
+.spanblock {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  line-height: 19px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  margin: 15px 0;
+}
+
 @media print {
   body {
     background: none;

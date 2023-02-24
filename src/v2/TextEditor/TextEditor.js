@@ -19,6 +19,7 @@ const TOOLBAR_OPTIONS = [
     [{ 'indent': '-1' }, { 'indent': '+1' }],
     [{ 'align': [] }, { 'direction': 'rtl' }],
     ['clean'],
+    ['spanblock']
 ]
 
 const TextEditor = () => {
@@ -27,10 +28,61 @@ const TextEditor = () => {
     const [quill, setQuill] = useState()
     const { id: documentID } = useParams()
 
+    let Inline = Quill.import('blots/inline')
+    const Parchment = Quill.imports.parchment;
+    const Delta = Quill.imports.delta;
+
+
+    class Icon extends Parchment.Embed {
+        static create(value) {
+            let node = super.create(value);
+            if (value && value !== true) {
+                console.log(value);
+                const button = document.createElement('button');
+                button.innerText = 'x';
+                button.onclick = () => node.remove();
+                button.contentEditable = 'false';
+                node?.append(button);
+                node?.append(value)
+            }
+            return node;
+        }
+    }
+
+    Icon.blotName = 'icon';
+    Icon.tagName = 'span';
+    Quill.register(Icon);
+
+
+    const spanBlockButton = document.querySelector('.ql-spanblock')
+
+    const keypress = useCallback(() => {
+
+        const selection = quill.getSelection();
+        const delta = new Delta()
+
+        let [line, offset] = quill.getLine(quill.getSelection().index);
+        let index = quill.getIndex(line);
+
+        const text = quill.getText(index, selection.index)
+        quill.deleteText(index, selection.index);
+        quill.insertText(index, " ", 'icon', text);
+        console.log(quill.getContents(index, selection.indent));
+    },
+        [quill, Delta]
+    )
+
+    useEffect(() => {
+        spanBlockButton?.addEventListener('click', keypress)
+    }, [keypress, spanBlockButton])
+
+
     useEffect(() => {
         // const s = io("http://localhost:3001/")
         const s = io("https://rte-sani-server.glitch.me/")
         setSocket(s);
+
+
 
         return () => {
             s.disconnect();
